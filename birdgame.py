@@ -15,16 +15,9 @@ class Bird(pygame.sprite.Sprite):
     """
 
     def __init__(self):
-        pygame.sprite.sprite.__init__(self)
-
-        self.birdImage = pygame.image.load('flappy.jpg')
-        self.birdImage = pygame.Surface([40, 40])
-
-    def __init__(self):
         pygame.sprite.Sprite.__init__(self)
 
-        self.image = pygame.Surface([35, 35])
-        self.image.fill([0, 0, 0])
+        self.image = pygame.image.load('plane_1.png')
 
         self.rect = self.image.get_rect()
 
@@ -32,6 +25,18 @@ class Bird(pygame.sprite.Sprite):
         self.rect.y = SCREEN_HEIGHT / 2
 
         self._space_pressed = False
+
+    def update(self):
+        if self._space_pressed:
+            self.y_velocity = -10
+        else:
+            self.y_velocity = 10
+        self.rect.y += self.y_velocity
+
+        if self.rect.y < 0:
+            self.rect.y = 0
+        if self.rect.y > SCREEN_HEIGHT - self.rect.height:
+            self.rect.y = SCREEN_HEIGHT - self.rect.height
 
 
 class Coin(pygame.sprite.Sprite):
@@ -41,8 +46,7 @@ class Coin(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
 
-        self.image = pygame.Surface([25, 25])
-        self.image.fill([255, 215, 0])
+        self.image = pygame.image.load('coin.jpeg')
 
         self.rect = self.image.get_rect()
 
@@ -112,7 +116,7 @@ class App:
         pygame.quit()
 
     def on_execute(self):
-        if self.on_init() == False:
+        if not self.on_init():
             self._running = False
 
         while(self._running):
