@@ -156,6 +156,8 @@ class App:
         self._explode_group = pygame.sprite.Group()
         self._gameover_group = pygame.sprite.Group()
 
+        self._coins_collected = 0
+        self._font = None
         # Whether bird is alive
 
         self._alive = True
@@ -167,6 +169,8 @@ class App:
         self._display_surf = pygame.display.set_mode(
             (SCREEN_WIDTH, SCREEN_HEIGHT), pygame.HWSURFACE | pygame.DOUBLEBUF)
         self._running = True
+        self._font = pygame.font.SysFont("monospace", 15)
+
         return True
 
     def on_event(self, event):
@@ -199,6 +203,7 @@ class App:
             for coin in self._coin_group.sprites():
                 if coin.rect.colliderect(self._bird.rect):
                     self._coin_group.remove(coin)
+                    self._coins_collected += 1
                 if coin.rect.x < 0 - coin.rect.width:
                     self._coin_group.remove(coin)
 
@@ -217,6 +222,11 @@ class App:
         else:
             # Draw explosion where the bird is
             pass
+
+        # render text
+        label = self._font.render("%d"%self._coins_collected, 1, (0,0,0))
+        self._display_surf.blit(label, (10, 10))
+
         self._coin_group.draw(self._display_surf)
         self._explode_group.draw(self._display_surf)
         pygame.display.flip()
