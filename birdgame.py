@@ -46,7 +46,7 @@ class Coin(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
 
-        self.image = pygame.image.load('coin.jpeg')
+        self.image = pygame.image.load('coin.png')
 
         self.rect = self.image.get_rect()
 
@@ -58,6 +58,43 @@ class Coin(pygame.sprite.Sprite):
     def update(self):
         self.rect.x += self.x_velocity
 
+class GameOver(pygame.sprite.Sprite):
+
+    '''GameOver class'''
+
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+
+        self.image = pygame.image.load('GameOver.jpeg')
+
+        self.rect = self.image.get_rect()
+
+        self.rect.x = SCREEN_WIDTH
+        self.rect.y = random.random() * SCREEN_HEIGHT
+
+        self.x_velocity = -10
+
+    #def update(self)
+   
+
+class Explode(pygame.sprite.Sprite):
+
+    '''Explode class'''
+
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+
+        self.image = pygame.image.load('Explode.png')
+
+        self.rect = self.image.get_rect()
+
+        self.rect.x = SCREEN_WIDTH
+        self.rect.y = random.random() * SCREEN_HEIGHT
+
+        self.x_velocity = -10
+
+    def update(self):
+        self.rect.x += self.x_velocity
 
 class App:
 
@@ -71,6 +108,12 @@ class App:
         self._bird_group.add(self._bird)
 
         self._coin_group = pygame.sprite.Group()
+        self._explode_group = pygame.sprite.Group()
+        self._gameover_group = pygame.sprite.Group()
+
+        # Whether bird is alive
+
+        self._alive = True
 
         self._fps = 30
 
@@ -96,9 +139,16 @@ class App:
         self._bird_group.update()
         if random.randrange(1, 11) == 1:
             coin = Coin()
+            gameover = GameOver()
             self._coin_group.add(coin)
 
-        self._coin_group.update()
+        if random.randrange(1, 11) == 1:    
+            explode = Explode()
+            self._explode_group.add(explode)
+
+        if self._alive:
+            self._coin_group.update()
+            self._explode_group.update()
 
         for coin in self._coin_group.sprites():
             if coin.rect.colliderect(self._bird.rect):
@@ -106,10 +156,23 @@ class App:
             if coin.rect.x < 0 - coin.rect.width:
                 self._coin_group.remove(coin)
 
+        for explode in self._explode_group.sprites():
+            if explode.rect.colliderect(self._bird.rect):
+                self._alive = False
+                add(gameover)
+            if explode.rect.x < 0 - explode.rect.width:
+                self._explode_group.remove(explode)        
+
+
     def on_render(self):
         self._display_surf.fill([255, 255, 255])
-        self._bird_group.draw(self._display_surf)
+        if self._alive:
+            self._bird_group.draw(self._display_surf)
+        else:
+            # Draw explosion where the bird is
+            pass
         self._coin_group.draw(self._display_surf)
+        self._explode_group.draw(self._display_surf)
         pygame.display.flip()
 
     def on_cleanup(self):
